@@ -1,6 +1,11 @@
 module vperlin
 
-// Ported from: http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html
+// Initially ported from: 
+// http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html
+//
+// See also the original Perlin's code from:
+// https://mrl.nyu.edu/~perlin/noise/ 
+// http://mrl.nyu.edu/~perlin/paper445.pdf
 
 const (
 	perm = [
@@ -76,9 +81,8 @@ fn grad(hash int, x f64, y f64, z f64) f64 {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////
-
-pub fn noise(xx f64, yy f64, zz f64) f64 {
+[inline]
+fn p_noise3d(xx f64, yy f64, zz f64) f64 {
 	mut x := xx   mut y := yy   mut z := zz
 		
 	ix := int(x) x -= ix
@@ -86,7 +90,11 @@ pub fn noise(xx f64, yy f64, zz f64) f64 {
 	iz := int(z) z -= iz
 
 	gx := ix & 0xFF   gy := iy & 0xFF   gz := iz & 0xFF
-      
+  
+  // gx gy gz -> unit cube containing the xx yy zz point
+  // x y z -> relative coords *inside* the unit cube
+
+  // compute hash coordinates of the 8 cube corners
 	a0 := gy + perm[gx]	b0 := gy + perm[gx + 1]
 	aa := gz + perm[a0]	ab := gz + perm[a0 + 1]
 	ba := gz + perm[b0]	bb := gz + perm[b0 + 1]
@@ -105,9 +113,13 @@ pub fn noise(xx f64, yy f64, zz f64) f64 {
 	a7 := grad(ba0, x-1, y  , z  )
 	a8 := grad(aa0, x  , y  , z  )
 	
-	u := fade(x)	v := fade(y)	w := fade(z)
+	u := fade(x)	v := fade(y)	w := fade(z) // fade curves
 	
+  // return the blended results from the 8 corners of the cube
 	a8_5 := lerp(v, lerp(u, a8, a7), lerp(u, a6, a5))
-	a4_1 := lerp(v, lerp(u, a4, a3), lerp(u, a2, a1))
+	a4_1 := lerp(v, lerp(u, a4, a3), lerp(u, a2, a1))  
 	return lerp(w, a8_5, a4_1)
 }
+
+////////////////////////////////////////////////////////////////////////////
+pub fn noise(xx f64, yy f64, zz f64) f64 { return p_noise3d(xx, yy, zz) }
