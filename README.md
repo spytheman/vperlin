@@ -4,6 +4,10 @@ V module to calculate Perlin noise (https://en.wikipedia.org/wiki/Perlin_noise).
 This module is a V port based on http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html .
 
 # Usage:
+```shell
+v install spytheman.vperlin
+```
+... then in your v source:
 ```v
 import spytheman.vperlin as perlin
 
