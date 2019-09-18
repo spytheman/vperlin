@@ -46,17 +46,40 @@ const (
 )
 
 [inline]
-fn fade(t f64) f64 {
-	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+fn fade(t f64) f64 { 	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0) }
+
+[inline]
+fn lerp(t f64, a f64, b f64) f64 {	return a + t * (b - a) }
+
+[inline]
+fn grad2d(hash int, x f64, y f64) f64 {
+  // h := hash & 0xF
+  // u := if h<8 { x } else { y }
+  // v := if h<4 { y } else { if (h==12||h==14) { x } else { 0 } }
+  // return ( if (h&1) == 0 { u } else {-u } ) + ( if (h&2) == 0  { v } else { -v } )
+  switch(hash & 0xF){
+  case 0x0: return  x + y
+  case 0x1: return -x + y
+  case 0x2: return  x - y
+  case 0x3: return -x - y
+  case 0x4: return  x
+  case 0x5: return -x
+  case 0x6: return  x
+  case 0x7: return -x
+  case 0x8: return  y
+  case 0x9: return -y
+  case 0xA: return  y
+  case 0xB: return -y
+  case 0xC: return  y + x
+  case 0xD: return -y
+  case 0xE: return  y - x
+  case 0xF: return -y
+  default:  return 0
+  }
 }
 
 [inline]
-fn lerp(t f64, a f64, b f64) f64 {
-	return a + t * (b - a)
-}
-
-[inline]
-fn grad(hash int, x f64, y f64, z f64) f64 {
+fn grad3d(hash int, x f64, y f64, z f64) f64 {
 	//f64 u = (h < 8) ? x : y
 	//f64 v = (h < 4) ? y : ((h == 12 || h == 14) ? x : z)
 	//return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v)
@@ -89,6 +112,8 @@ fn p_noise3d(xx f64, yy f64, zz f64) f64 {
 	iy := int(y) y -= iy
 	iz := int(z) z -= iz
 
+	u := fade(x)	v := fade(y)	w := fade(z) // fade curves
+
 	gx := ix & 0xFF   gy := iy & 0xFF   gz := iz & 0xFF
   
   // gx gy gz -> unit cube containing the xx yy zz point
@@ -104,16 +129,15 @@ fn p_noise3d(xx f64, yy f64, zz f64) f64 {
 	ba0 := perm[ba] ba1 := perm[ba + 1]
 	bb0 := perm[bb] bb1 := perm[bb + 1]
 
-	a1 := grad(bb1, x-1, y-1, z-1)
-	a2 := grad(ab1, x  , y-1, z-1)
-	a3 := grad(ba1, x-1, y  , z-1)
-	a4 := grad(aa1, x  , y  , z-1)
-	a5 := grad(bb0, x-1, y-1, z  )
-	a6 := grad(ab0, x  , y-1, z  )
-	a7 := grad(ba0, x-1, y  , z  )
-	a8 := grad(aa0, x  , y  , z  )
+	a1 := grad3d(bb1, x-1, y-1, z-1)
+	a2 := grad3d(ab1, x  , y-1, z-1)
+	a3 := grad3d(ba1, x-1, y  , z-1)
+	a4 := grad3d(aa1, x  , y  , z-1)
+	a5 := grad3d(bb0, x-1, y-1, z  )
+	a6 := grad3d(ab0, x  , y-1, z  )
+	a7 := grad3d(ba0, x-1, y  , z  )
+	a8 := grad3d(aa0, x  , y  , z  )
 	
-	u := fade(x)	v := fade(y)	w := fade(z) // fade curves
 	
   // return the blended results from the 8 corners of the cube
 	a8_5 := lerp(v, lerp(u, a8, a7), lerp(u, a6, a5))
@@ -121,5 +145,24 @@ fn p_noise3d(xx f64, yy f64, zz f64) f64 {
 	return lerp(w, a8_5, a4_1)
 }
 
+/// https://mrl.nyu.edu/~perlin/noise/ImprovedNoise2D.java
+[inline]
+fn p_noise2d(xx f64, yy f64) f64 {
+      ix := int(xx) gx := ix & 0xFF
+      iy := int(yy) gy := iy & 0xFF
+      x := xx - ix  y := yy - iy
+      u := fade(x)  v := fade(y)
+      a := perm[gx]   + gy  aa := perm[a]  ab := perm[a+1]
+      b := perm[gx+1] + gy  ba := perm[b]  bb := perm[b+1]
+      return lerp(v, lerp(u, grad2d(perm[aa], x  , y  ), grad2d(perm[ba], x-1, y  )),
+                     lerp(u, grad2d(perm[ab], x  , y-1), grad2d(perm[bb], x-1, y-1)))
+}
+
 ////////////////////////////////////////////////////////////////////////////
-pub fn noise(xx f64, yy f64, zz f64) f64 { return p_noise3d(xx, yy, zz) }
+
+// noise/3 is for compatibility
+pub fn noise(xx f64, yy f64, zz f64) f64 { return p_noise3d(xx, yy, zz) } 
+
+pub fn noise3d(xx f64, yy f64, zz f64) f64 { return p_noise3d(xx, yy, zz) }
+
+pub fn noise2d(xx f64, yy f64) f64 { return p_noise2d(xx, yy) }
