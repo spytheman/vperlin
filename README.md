@@ -1,5 +1,7 @@
 # vperlin
-V module to calculate perlin noise.
+V module to calculate Perlin noise (https://en.wikipedia.org/wiki/Perlin_noise).
+
+This module is a V port based on http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html .
 
 # Development setup for contribution:
 1. Fork this repository (<https://github.com/spytheman/vperlin/fork>)
