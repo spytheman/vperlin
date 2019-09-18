@@ -1,5 +1,7 @@
 module vperlin
 
+// Ported from: http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html
+
 const (
 	perm = [
 		int(151), 160, 137,  91,  90,  15, 131,  13,    201,  95,  96,  53, 194, 233,   7, 225,
