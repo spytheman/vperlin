@@ -51,6 +51,9 @@ fn fade(t f64) f64 { 	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0) }
 [inline]
 fn lerp(t f64, a f64, b f64) f64 {	return a + t * (b - a) }
 
+///////////////////////////////////////////////////////////////////////////////////////
+
+/// https://mrl.nyu.edu/~perlin/noise/ImprovedNoise2D.java
 [inline]
 fn grad2d(hash int, x f64, y f64) f64 {
   // h := hash & 0xF
@@ -77,6 +80,20 @@ fn grad2d(hash int, x f64, y f64) f64 {
   default:  return 0
   }
 }
+
+[inline]
+fn p_noise2d(xx f64, yy f64) f64 {
+      ix := int(xx) gx := ix & 0xFF
+      iy := int(yy) gy := iy & 0xFF
+      x := xx - ix  y := yy - iy
+      u := fade(x)  v := fade(y)
+      a := perm[gx]   + gy  aa := perm[a]  ab := perm[a+1]
+      b := perm[gx+1] + gy  ba := perm[b]  bb := perm[b+1]
+      return lerp(v, lerp(u, grad2d(perm[aa], x  , y  ), grad2d(perm[ba], x-1, y  )),
+                     lerp(u, grad2d(perm[ab], x  , y-1), grad2d(perm[bb], x-1, y-1)))
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 [inline]
 fn grad3d(hash int, x f64, y f64, z f64) f64 {
@@ -145,19 +162,8 @@ fn p_noise3d(xx f64, yy f64, zz f64) f64 {
 	return lerp(w, a8_5, a4_1)
 }
 
-/// https://mrl.nyu.edu/~perlin/noise/ImprovedNoise2D.java
-[inline]
-fn p_noise2d(xx f64, yy f64) f64 {
-      ix := int(xx) gx := ix & 0xFF
-      iy := int(yy) gy := iy & 0xFF
-      x := xx - ix  y := yy - iy
-      u := fade(x)  v := fade(y)
-      a := perm[gx]   + gy  aa := perm[a]  ab := perm[a+1]
-      b := perm[gx+1] + gy  ba := perm[b]  bb := perm[b+1]
-      return lerp(v, lerp(u, grad2d(perm[aa], x  , y  ), grad2d(perm[ba], x-1, y  )),
-                     lerp(u, grad2d(perm[ab], x  , y-1), grad2d(perm[bb], x-1, y-1)))
-}
-
+////////////////////////////////////////////////////////////////////////////
+// Public interface of the v module:
 ////////////////////////////////////////////////////////////////////////////
 
 // noise/3 is for compatibility
