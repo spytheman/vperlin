@@ -1,4 +1,4 @@
-import spytheman.perlin
+import spytheman.vperlin as perlin
 
 fn main(){
 	//	println( perlin.perm )

@@ -1,4 +1,4 @@
-module perlin
+module vperlin
 
 const (
 	perm = [
