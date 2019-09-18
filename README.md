@@ -1,7 +1,7 @@
 # vperlin
 V module to calculate [Perlin noise](https://en.wikipedia.org/wiki/Perlin_noise) .
 
-This module is a V port based on http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html .
+This module is a pure V port, initially based on code from http://riven8192.blogspot.com/2010/08/calculate-perlinnoise-twice-as-fast.html .
 
 # Usage:
 ```shell
