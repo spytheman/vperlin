@@ -46,15 +46,15 @@ const (
 )
 
 [inline]
-fn fade(t f64) f64 {    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0) }
+pub fn fade(t f64) f64 {    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0) }
 
 [inline]
-fn lerp(t f64, a f64, b f64) f64 {  return a + t * (b - a) }
+pub fn lerp(t f64, a f64, b f64) f64 {  return a + t * (b - a) }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // 2D Perlin noise, see https://mrl.nyu.edu/~perlin/noise/ImprovedNoise2D.java
 [inline]
-fn grad2d(hash int, x f64, y f64) f64 {
+pub fn grad2d(hash int, x f64, y f64) f64 {
   // h := hash & 0xF
   // u := if h<8 { x } else { y }
   // v := if h<4 { y } else { if (h==12||h==14) { x } else { 0 } }
@@ -81,7 +81,7 @@ fn grad2d(hash int, x f64, y f64) f64 {
 }
 
 [inline]
-fn p_noise2d(xx f64, yy f64) f64 {
+pub fn noise2d(xx f64, yy f64) f64 {
       ix := int(xx) gx := ix & 0xFF
       iy := int(yy) gy := iy & 0xFF
       x := xx - ix  y := yy - iy
@@ -95,7 +95,7 @@ fn p_noise2d(xx f64, yy f64) f64 {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 [inline]
-fn grad3d(hash int, x f64, y f64, z f64) f64 {
+pub fn grad3d(hash int, x f64, y f64, z f64) f64 {
     //f64 u = (h < 8) ? x : y
     //f64 v = (h < 4) ? y : ((h == 12 || h == 14) ? x : z)
     //return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v)
@@ -121,7 +121,7 @@ fn grad3d(hash int, x f64, y f64, z f64) f64 {
 }
 
 [inline]
-fn p_noise3d(xx f64, yy f64, zz f64) f64 {
+pub fn noise3d(xx f64, yy f64, zz f64) f64 {
     mut x := xx   mut y := yy   mut z := zz
 
     ix := int(x) x -= ix
@@ -165,7 +165,7 @@ fn p_noise3d(xx f64, yy f64, zz f64) f64 {
 // Port of the 4D variant of the Perlin noise, see
 // https://mrl.nyu.edu/~perlin/noise/ImprovedNoise4D.java
 [inline]
-fn grad4d(hash int, x f64, y f64, z f64, w f64) f64 {
+pub fn grad4d(hash int, x f64, y f64, z f64, w f64) f64 {
     h:=hash & 31 // CONVERT LO 5 BITS OF HASH TO 32 GRAD DIRECTIONS.
     mut a:=y mut b:=z mut c:=w // X,Y,Z
     switch (h >> 3) { // OR, DEPENDING ON HIGH ORDER 2 BITS:
@@ -180,7 +180,7 @@ fn grad4d(hash int, x f64, y f64, z f64, w f64) f64 {
 }
 
 [inline]
-fn p_noise4d(xx f64, yy f64, zz f64, ww f64) f64 {
+pub fn noise4d(xx f64, yy f64, zz f64, ww f64) f64 {
     ix := int(xx)  x := xx-ix  gx := ix & 0xFF
     iy := int(yy)  y := yy-iy  gy := iy & 0xFF
     iz := int(zz)  z := zz-iz  gz := iz & 0xFF
@@ -214,13 +214,7 @@ fn p_noise4d(xx f64, yy f64, zz f64, ww f64) f64 {
     )
 }
 
-////////////////////////////////////////////////////////////////////////////
-// Public interface of the v module:
-////////////////////////////////////////////////////////////////////////////
+// support noise/3 is for compatibility
+[inline]
+pub fn noise(xx f64, yy f64, zz f64) f64 { return noise3d(xx, yy, zz) }
 
-// noise/3 is for compatibility
-pub fn noise(xx f64, yy f64, zz f64) f64 { return p_noise3d(xx, yy, zz) }
-
-pub fn noise2d(xx f64, yy f64) f64 { return p_noise2d(xx, yy) }
-pub fn noise3d(xx f64, yy f64, zz f64) f64 { return p_noise3d(xx, yy, zz) }
-pub fn noise4d(xx f64, yy f64, zz f64, ww f64) f64 { return p_noise4d(xx, yy, zz, ww) }
