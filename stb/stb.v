@@ -1,6 +1,7 @@
 module stb
 
 #flag -I @VMOD/spytheman/vperlin/stb
+#flag linux -mtune=native -march=native
 #flag @VMOD/spytheman/vperlin/stb/stb_perlin.o
 #include "stb_perlin.h"
 
