@@ -7,9 +7,9 @@ module vperlin
 // https://mrl.nyu.edu/~perlin/noise/
 // http://mrl.nyu.edu/~perlin/paper445.pdf
 
-const (
+pub const (
     perm = [
-        int(151), 160, 137,  91,  90,  15, 131,  13,    201,  95,  96,  53, 194, 233,   7, 225,
+    151, 160, 137,  91,  90,  15, 131,  13,    201,  95,  96,  53, 194, 233,   7, 225,
             140,   36,  103,  30,  69, 142,   8,  99,     37, 240,  21,  10,  23, 190,   6, 148,
             247,   120, 234,  75,   0,  26, 197,  62,     94, 252, 219, 203, 117,  35,  11,  32,
             57,    177,  33,  88, 237, 149,  56,  87,    174,  20, 125, 136, 171, 168,  68, 175,
@@ -59,25 +59,25 @@ pub fn grad2d(hash int, x f64, y f64) f64 {
   // u := if h<8 { x } else { y }
   // v := if h<4 { y } else { if (h==12||h==14) { x } else { 0 } }
   // return ( if (h&1) == 0 { u } else {-u } ) + ( if (h&2) == 0  { v } else { -v } )
-  switch(hash & 0xF){
-  case 0x0: return  x + y
-  case 0x1: return -x + y
-  case 0x2: return  x - y
-  case 0x3: return -x - y
-  case 0x4: return  x
-  case 0x5: return -x
-  case 0x6: return  x
-  case 0x7: return -x
-  case 0x8: return  y
-  case 0x9: return -y
-  case 0xA: return  y
-  case 0xB: return -y
-  case 0xC: return  y + x
-  case 0xD: return -y
-  case 0xE: return  y - x
-  case 0xF: return -y
-  default:  return 0
-  }
+  match (hash & 0xF){  
+   0x0 { return  x + y }
+   0x1 { return -x + y }
+   0x2 { return  x - y }
+   0x3 { return -x - y }
+   0x4 { return  x }
+   0x5 { return -x }
+   0x6 { return  x }
+   0x7 { return -x }
+   0x8 { return  y }
+   0x9 { return -y }
+   0xA { return  y }
+   0xB { return -y }
+   0xC { return  y + x }
+   0xD { return -y }
+   0xE { return  y - x }
+   0xF { return -y }
+   else { return 0 }
+   }
 }
 
 [inline]
@@ -99,24 +99,24 @@ pub fn grad3d(hash int, x f64, y f64, z f64) f64 {
     //f64 u = (h < 8) ? x : y
     //f64 v = (h < 4) ? y : ((h == 12 || h == 14) ? x : z)
     //return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v)
-    switch(hash & 0xF){
-        case 0x0: return  x + y
-        case 0x1: return -x + y
-        case 0x2: return  x - y
-        case 0x3: return -x - y
-        case 0x4: return  x + x
-        case 0x5: return -x + x
-        case 0x6: return  x - x
-        case 0x7: return -x - x
-        case 0x8: return  y + x
-        case 0x9: return -y + x
-        case 0xA: return  y - x
-        case 0xB: return -y - x
-        case 0xC: return  y + z
-        case 0xD: return -y + x
-        case 0xE: return  y - x
-        case 0xF: return -y - z
-        default: return 0 // never happens
+    match (hash & 0xF) {
+    0x0 { return  x + y }
+    0x1 { return -x + y }
+    0x2 { return  x - y }
+    0x3 { return -x - y }
+    0x4 { return  x + x }
+    0x5 { return -x + x }
+    0x6 { return  x - x }
+    0x7 { return -x - x }
+    0x8 { return  y + x }
+    0x9 { return -y + x }
+    0xA { return  y - x }
+    0xB { return -y - x }
+    0xC { return  y + z }
+    0xD { return -y + x }
+    0xE { return  y - x }
+    0xF { return -y - z }
+    else { return 0 } // never happens
     }
 }
 
@@ -168,10 +168,11 @@ pub fn noise3d(xx f64, yy f64, zz f64) f64 {
 pub fn grad4d(hash int, x f64, y f64, z f64, w f64) f64 {
     h:=hash & 31 // CONVERT LO 5 BITS OF HASH TO 32 GRAD DIRECTIONS.
     mut a:=y mut b:=z mut c:=w // X,Y,Z
-    switch (h >> 3) { // OR, DEPENDING ON HIGH ORDER 2 BITS:
-    case 1: { a=w b=x c=y } // W,X,Y
-    case 2: { a=z b=w c=x } // Z,W,X
-    case 3: { a=y b=z c=w } // Y,Z,W
+    match (h >> 3) { // OR, DEPENDING ON HIGH ORDER 2 BITS:
+    1 { a=w b=x c=y } // W,X,Y
+    2 { a=z b=w c=x } // Z,W,X
+    3 { a=y b=z c=w } // Y,Z,W
+    else {}
     }
     aa := if 0 == h&4 { -a } else { a }
     bb := if 0 == h&2 { -b } else { b }
