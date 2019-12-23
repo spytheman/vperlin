@@ -1,2 +1,6 @@
 fns.txt
 examples/simple
+examples/stb_example
+examples/stb_example.exe
+stb/stb_perlin.o
+stb/stb_perlin.obj
