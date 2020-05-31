@@ -1,8 +1,8 @@
 module stb
 
-#flag -I @VMOD/spytheman/vperlin/stb
+#flag -I @VROOT/stb
 #flag linux -mtune=native -march=native
-#flag @VMOD/spytheman/vperlin/stb/stb_perlin.o
+#flag @VROOT/stb/stb_perlin.o
 #include "stb_perlin.h"
 
              fn C.stb_perlin_noise3(x f32, y f32, z f32, x_wrap int, y_wrap int, z_wrap int) f32
